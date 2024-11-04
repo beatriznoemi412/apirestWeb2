@@ -219,7 +219,7 @@ class SaleApiController
         }
 
         // Validación de campos vacíos
-        if (empty($req->body->inmueble) || empty($req->body->fecha_venta) || empty($req->body->precio) || empty($req->body->id_vendedor) || empty($req->body->url_foto)) {
+        if (empty($req->body->inmueble) || empty($req->body->fecha_venta) || empty($req->body->precio) || empty($req->body->id_vendedor) || empty($req->body->foto_url)) {
             return $this->view->response('Todos los campos son obligatorios.', 400);
         }
 

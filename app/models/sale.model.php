@@ -82,7 +82,7 @@ class SaleModel {
             return $query->fetchColumn();
         }
     public function updateSale($id, $inmueble, $date, $price, $id_vendedor, $image) {    
-        $query = $this->db->prepare('UPDATE venta SET inmueble = ?, fecha_venta = ?, precio = ?, id_vendedor = ?, url_foto = ? WHERE id_venta = ?');
+        $query = $this->db->prepare('UPDATE venta SET inmueble = ?, fecha_venta = ?, precio = ?, id_vendedor = ?, foto_url = ? WHERE id_venta = ?');
         $query->execute([$inmueble, $date, $price, $id_vendedor, $image, $id]);
     }
 } 
