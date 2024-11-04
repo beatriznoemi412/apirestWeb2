@@ -202,7 +202,7 @@ class SaleApiController
                 return $this->view->response('No hay vendedores disponibles.', 404);
             }
         }
-        //devuelve recurso insertado-buena pactica-.
+        //devuelve recurso insertado-buena practica-.
         $sale = $this->model->getSale($id);
         return $this->view->response($sale, 201);
     }

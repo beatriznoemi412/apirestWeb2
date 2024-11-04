@@ -73,7 +73,7 @@ Posibles Respuestas:
     "id_vendedor": 3,
     "image": "https://example.com/image.jpg"
 }
-400 Bad Request: Faltan campos requeridos o la URL de la imagen no es válida.
+400 Bad Request: Todos los campos son obligatorios o la URL de la imagen no es válida.
 {
     "Todos los campos son obligatorios."
 }
@@ -94,7 +94,7 @@ id (obligatorio): El ID de la venta a editar.
 
 Cuerpo de la solicitud: Debe incluir todos los campos obligatorios de la venta.
 
-json
+json, ej.:
 {
   "inmueble": "Tipo de inmueble",
   "fecha_venta": "YYYY-MM-DD",
@@ -110,8 +110,9 @@ Si no se encuentra una venta con el id_venta especificado, el servidor devolver�
 Ejemplo de solicitud:
 
 PUT /venta/1
-json
-{
+json, ej.:
+{ 
+  "id_venta":81;
   "inmueble": "Apartamento",
   "fecha_venta": "2023-01-15",
   "precio": 200000,
@@ -122,7 +123,7 @@ Posibles respuestas:
 
 200 OK: La venta fue actualizada exitosamente.
 {
-  "Venta actualizada con éxito."
+  "Devuelve el objeto actualizado"
 }
 400 Bad Request: Algún campo en el cuerpo de la solicitud está vacío.
 {
