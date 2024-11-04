@@ -6,36 +6,37 @@ class SaleModel {
     public function __construct() {
         $this->db = new PDO('mysql:host=localhost;dbname=desarrolloinmobiliario;charset=utf8', 'root', '');
     }
-
-
-    public function getSales($sortField, $sortOrder) {
-        // Validar que los parámetros sean correctos
-        $validSortFields = ['inmueble', 'fecha_venta', 'precio', 'id_vendedor'];
-        $validSortOrders = ['asc', 'desc'];
+    public function getSales($sortField, $sortOrder, $filters, $limit, $offset, $params) {
+        // Construir la consulta SQL
+        $sql = "SELECT * FROM venta";
     
-        if (!in_array($sortField, $validSortFields) || !in_array($sortOrder, $validSortOrders)) {
-            throw new Exception('Parámetros de ordenamiento no válidos.');
+        // Agregar filtros si existen
+        if (!empty($filters)) {
+            $sql .= " WHERE " . implode(" AND ", $filters);
         }
     
-        // Preparar la consulta SQL con ordenamiento y paginación
-        $query = $this->db->prepare("SELECT * FROM venta ORDER BY $sortField $sortOrder");
+        // Agregar ordenamiento y limit
+        $sql .= " ORDER BY $sortField $sortOrder LIMIT :limit OFFSET :offset";
     
-        // Ejecutar la consulta
-        $query->execute();
-    
-        // Obtener los datos en un arreglo de objetos
-        $sales = $query->fetchAll(PDO::FETCH_OBJ); 
-    
-        // Comprobar si se encontraron resultados
-        if (empty($sales)) {
-            return []; // Retornar arreglo vacío si no hay ventas
+        $stmt = $this->db->prepare($sql);
+        
+        // Vincular parámetros
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
         }
+        
+        // Vincular límite y offset
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     
-        return $sales; // Retornar las ventas ordenadas y paginadas
+        $stmt->execute();
+    
+        // Retornar resultados como objetos
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
     
-
-    public function getSale($id) {    
+    
+    public function getSale($id) {  
         
             // Prepara y ejecuta la consulta
             $query = $this->db->prepare('SELECT * FROM venta WHERE id_venta = ?');
@@ -45,42 +46,43 @@ class SaleModel {
             $sale = $query->fetch(PDO::FETCH_OBJ);
         
             return $sale;
-
-    }
-    // Elimina una venta por ID (DELETE)
-    public function removeSale($id) {
-        $query = $this->db->prepare('DELETE FROM sales WHERE id = ?');
-        return $query->execute([$id]);
     }
      // Inserta una nueva venta (POST)
      public function insertSale($inmueble, $date, $price, $id_vendedor, $image) {
-        $query = $this->db->prepare('INSERT INTO sales (inmueble, date, price, id_vendedor, image) VALUES (?, ?, ?, ?, ?)');
-        $success = $query->execute([$inmueble, $date, $price, $id_vendedor, $image]);
+        $query = $this->db->prepare('INSERT INTO venta (inmueble, fecha_venta, precio, id_vendedor, foto_url) VALUES (?, ?, ?, ?, ?)');
+        $query -> execute([$inmueble, $date, $price, $id_vendedor, $image]);
 
-        // Devuelve el ID de la venta insertada o false en caso de error
-        return $success ? $this->db->lastInsertId() : false;
-    }
-
-    // Actualizar una venta existente (PUT)
-    public function updateSale($id, $inmueble, $date, $price, $id_vendedor, $image) {
-        $query = $this->db->prepare('UPDATE sales SET inmueble = ?, date = ?, price = ?, id_vendedor = ?, image = ? WHERE id = ?');
-        return $query->execute([$inmueble, $date, $price, $id_vendedor, $image, $id]);
-    }
-}
+        $id = $this->db->lastInsertId();
     
+        return $id;
 
-   /* 
-
-    public function updateSale($id, $inmueble, $date, $price, $id_vendedor, $image) {
-        try {
-            
-            $query = $this->db->prepare('UPDATE venta SET inmueble = ?, fecha_venta = ?, precio = ?, id_vendedor = ?, foto_url = ? WHERE id_venta = ?');
-            
-            // Ejecuta la consulta con los parámetros
-            return $query->execute([$inmueble, $date, $price, $id_vendedor, $image, $id]);
-        } catch (PDOException $e) {
-            error_log($e->getMessage()); // Log del error
-            return false; // Retorna false en caso de error
-        }
     }
-}*/
+    public function countSales($filters) {
+       
+            $sql = "SELECT COUNT(*) FROM venta WHERE 1=1"; 
+        
+            // Añade filtros
+            foreach ($filters as $key => $value) {
+                if (in_array($key, ['min_price', 'max_price', 'id_vendedor', 'start_date', 'end_date'])) {
+                    $sql .= " AND $key = :$key"; 
+                }
+            }
+        
+            $query = $this->db->prepare($sql);
+            
+            // Vincula los valores de los filtros
+            foreach ($filters as $key => $value) {
+                if (in_array($key, ['min_price', 'max_price', 'id_vendedor', 'start_date', 'end_date'])) {
+                    $query->bindValue(":$key", $value);
+                }
+            }
+        
+            $query->execute();
+            
+            return $query->fetchColumn();
+        }
+    public function updateSale($id, $inmueble, $date, $price, $id_vendedor, $image) {    
+        $query = $this->db->prepare('UPDATE venta SET inmueble = ?, fecha_venta = ?, precio = ?, id_vendedor = ?, url_foto = ? WHERE id_venta = ?');
+        $query->execute([$inmueble, $date, $price, $id_vendedor, $image, $id]);
+    }
+} 

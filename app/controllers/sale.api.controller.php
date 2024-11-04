@@ -1,120 +1,239 @@
-
 <?php
 require_once './app/models/seller.model.php';
 require_once './app/views/json.view.php';
 require_once './app/models/sale.model.php';
 
-class SaleApiController {
+class SaleApiController
+{
     private $model;
     private $view;
     private $sellerModel;
+    private $page;
+    private $limit;
 
-    public function __construct() {
+    public function __construct($page = 1, $limit = 3)
+    {
         $this->model = new SaleModel();
         $this->sellerModel = new SellerModel();
         $this->view = new JSONView();
+
+        // Inicializamos las propiedades de clase para paginación
+        $this->page = $page;
+        $this->limit = $limit;
     }
-    
+    //api/venta
+    public function getAllSales($req, $res)
+    {
+        // Parámetros permitidos
+        $allowedParams = ['sortField', 'sortOrder', 'page', 'limit', 'min_price', 'max_price', 'id_vendedor', 'start_date', 'end_date', 'resource', 'id_venta'];
 
-    public function getAllSales($req, $res) {
-        // Establece el campo de ordenamiento y el orden por defecto
-        $sortField = 'precio'; // Siempre ordenar por precio
-        $sortOrder = 'asc'; // Orden ascendente
-    
-       // Log de los parámetros de ordenamiento
-        error_log("Parámetros de ordenamiento: ");
-        error_log("sortField: $sortField");
-        error_log("sortOrder: $sortOrder");
-        // Obtiene la lista de ventas ordenada por precio ascendente
-        $sales = $this->model->getSales($sortField, $sortOrder, -1, 0); // Usar -1 para obtener todas las ventas
-    
-        // Prepara la respuesta
-        $response = [
-            'sales' => $sales,
-        ];
-    
-        // Establece la respuesta y la envía
-        $res->setBody($response);
-        return $res->send(); // Envía la respuesta
-    }    
-    
-    // Obtiene una venta por ID (GET)
-    public function get($req, $res) {
-     // obtengo el id del vendedor desde la ruta
-     $id = $req->params->id_venta;
+        // Obtener parámetros de la solicitud
+        $queryParams = array_keys($_GET);
 
-     // obtengo el vendedor de la DB
-     $sale = $this->model->getSale($id);
-
-     // verifico si se encontró el vendedor
-     if (!$sale) {
-         return $this->view->response(['error' => 'Venta no encontrada'], 404);
-     }
-
-     return $this->view->response($sale);
-    }
-    //apiRest/venta (DELETE)
-    public function delete($req, $res) {
-        // Obtiene el ID de la venta desde la ruta
-        $id = $req->params->id_venta;
-    
-        // Verifica si la venta existe
-        $sale = $this->model->getSale($id);
-        if (!$sale) {
-            return $this->view->response(['error' => 'Venta no encontrada.'], 404);
+        // Verificar si hay parámetros no permitidos
+        foreach ($queryParams as $param) {
+            if (!in_array($param, $allowedParams)) {
+                return $this->view->response('Parámetro no permitido: ' . $param, 400);
+            }
         }
-    
-        // Elimina la venta de la base de datos
-        if ($this->model->removeSale($id)) {
-            return $this->view->response(['message' => 'Venta eliminada con éxito.'], 200);
-        } else {
-            return $this->view->response(['error' => 'Hubo un problema al eliminar la venta.'], 500);
-        }
-    }
-    // apiRest/venta (POST)
-    public function addSale($req, $res) {
+        // Ordenamiento
+        $sortFields = ['precio', 'fecha_venta', 'id_vendedor'];
+        $userSortField = isset($_GET['sortField']) && in_array($_GET['sortField'], $sortFields)
+            ? $_GET['sortField']
+            : 'precio'; // campo de orden por defecto
 
-    
-        // Verifica si el formulario fue enviado correctamente
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Valida que los campos requeridos estén completos
-            if (empty($req->body->inmueble) || empty($req->body->date) || empty($req->body->price) || empty($req->body->id_vendedor) || empty($req->body->image)) {
-                return $this->view->response('Todos los campos son obligatorios.', 400);
+        // Obtiene el parámetro de orden del usuario (asc o desc) usando $_GET y usa 'asc' por defecto
+        $userSortOrder = isset($_GET['sortOrder']) && $_GET['sortOrder'] === 'desc' ? 'desc' : 'asc';
+
+        // Paginación
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : $this->page;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : $this->limit;
+
+        // Validación de la página
+        if ($page < 1) {
+            $page = 1; // Forzar a la primera página si se proporciona un valor menor
+        }
+
+        // Validación del límite
+        if ($limit < 1) {
+            $limit = 10; // Establecer un límite predeterminado
+        }
+
+        // Cálculo del offset
+        $offset = ($page - 1) * $limit;
+
+        // Filtros
+        $filters = [];
+        $params = [];
+
+        // Filtra por precio
+        if (isset($_GET['min_price'])) {
+            $minPrice = filter_var($_GET['min_price'], FILTER_VALIDATE_FLOAT);
+            if ($minPrice !== false) {
+                $filters[] = "precio >= :min_price"; // Usa la columna "precio"
+                $params[':min_price'] = $minPrice; // Agrega parámetro
+            }
+        }
+
+        if (isset($_GET['max_price'])) {
+            $maxPrice = filter_var($_GET['max_price'], FILTER_VALIDATE_FLOAT);
+            if ($maxPrice !== false) {
+                $filters[] = "precio <= :max_price"; // Usa la columna "precio"
+                $params[':max_price'] = $maxPrice; // Agrega parámetro
+            }
+        }
+
+        if (isset($_GET['id_vendedor'])) {
+            $idVendedor = filter_var($_GET['id_vendedor'], FILTER_VALIDATE_INT);
+            if ($idVendedor === false) {
+                return $this->view->response('ID de vendedor inválido. Debe ser un número entero.', 400);
+            }
+            $filters[] = "id_vendedor = :id_vendedor";
+            $params[':id_vendedor'] = $idVendedor;
+        }
+
+
+        // Valida start_date
+        if (isset($_GET['start_date'])) {
+            $startDate = $_GET['start_date'];
+            if (!$this->isValidDate($startDate)) {
+                return $this->view->response(['error' => 'Fecha de inicio no válida. Debe estar en formato YYYY-MM-DD y ser una fecha real.'], 400);
+            }
+            $filters[] = "fecha_venta >= :start_date";
+            $params[':start_date'] = $startDate;
+        }
+
+        // Valida end_date
+        if (isset($_GET['end_date'])) {
+            $endDate = $_GET['end_date'];
+            if (!$this->isValidDate($endDate)) {
+                return $this->view->response(['error' => 'Fecha de fin no válida. Debe estar en formato YYYY-MM-DD y ser una fecha real.'], 400);
             }
 
-            // Obtiene los datos del cuerpo de la solicitud
-            $inmueble = $req->body->inmueble;  
-            $date = $req->body->date;
-            $price = $req->body->price;
-            $id_vendedor = $req->body->id_vendedor;
-            $image = $req->body->image;
+            // Valida que end_date no sea anterior a start_date
+            if (isset($startDate) && $startDate > $endDate) {
+                return $this->view->response(['error' => 'La fecha de fin no puede ser anterior a la fecha de inicio.'], 400);
+            }
 
-            // Valida que la URL de la imagen sea válida
+            $filters[] = "fecha_venta <= :end_date";
+            $params[':end_date'] = $endDate;
+        }
+        // Obtiene ventas con filtros y paginación
+        try {
+            $sales = $this->model->getSales($userSortField, $userSortOrder, $filters, $limit, $offset, $params);
+            $totalSales = $this->model->countSales($filters, $params);
+            if ($totalSales < 0) {
+                $totalSales = 0; // En caso de que haya un error
+            }
+
+            // Para cada venta, obtiene el vendedor
+            foreach ($sales as &$sale) {
+                $seller = $this->sellerModel->getSeller($sale->id_vendedor);
+                $sale->id_vendedor = $seller ?  $seller->id_vendedor  : 'Desconocido';
+            }
+
+            $response = [
+                'ventas' => $sales,
+                'pagina' => $page,
+                'limite' => $limit,
+                'total_ventas' => $totalSales,
+                'total_paginas' => ceil($totalSales / $limit),
+            ];
+
+            $res->setBody($response);
+            return $res->send();
+        } catch (Exception $e) {
+            $res->setStatusCode(500);
+            $res->setBody(['error' => $e->getMessage()]);
+            return $res->send();
+        }
+    }
+
+
+
+    private function isValidDate($date)
+    {
+        // Valida con una expresión regular que el formato sea estrictamente YYYY-MM-DD
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            return false;
+        }
+        $dateTime = DateTime::createFromFormat('Y-m-d', $date);
+        return $dateTime && $dateTime->format('Y-m-d') === $date;
+    }
+
+    //api/venta/:id (GET)
+    public function get($req, $res)
+    {
+        $id = $req->params->id_venta;
+        $sale = $this->model->getSale($id);
+
+        if (!$sale) {
+            return $this->view->response(['error' => 'Venta no encontrada'], 404);
+        }
+
+        return $this->view->response($sale);
+    }
+    //api/venta/:id (POST)
+    public function addSale($req, $res)
+    {   //valido datos
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (empty($req->body->inmueble) || empty($req->body->fecha_venta) || empty($req->body->precio) || empty($req->body->id_vendedor) || empty($req->body->foto_url)) {
+                return $this->view->response('Todos los campos son obligatorios.', 400);
+            }
+            //obtengo datos
+            $inmueble = $req->body->inmueble;
+            $date = $req->body->fecha_venta;
+            $price = $req->body->precio;
+            $id_vendedor = $req->body->id_vendedor;
+            $image = $req->body->foto_url;
+
             if (!filter_var($image, FILTER_VALIDATE_URL)) {
                 return $this->view->response('La URL de la imagen no es válida.', 400);
             }
-
-            // Inserta la venta en la base de datos
+            //inserto datos
             $id = $this->model->insertSale($inmueble, $date, $price, $id_vendedor, $image);
 
-            // Verifica si la inserción fue exitosa
             if (!$id) {
                 return $this->view->response("Error al insertar tarea", 500);
             }
-     
         } else {
-            // Llama al método para obtener la lista de vendedores
-            $sellers = $this->sellerModel->getSellers(); // Obtener la lista de vendedores
-
-            // Compruebo si se obtuvieron vendedores
+            $sellers = $this->sellerModel->getSellers();
             if (empty($sellers)) {
                 return $this->view->response('No hay vendedores disponibles.', 404);
             }
-
         }
-        // buena práctica es devolver el recurso insertado
+        //devuelve recurso insertado-buena pactica-.
         $sale = $this->model->getSale($id);
         return $this->view->response($sale, 201);
     }
+
+    //api/venta/:id (PUT)
+    public function editSale($req, $res)
+    {
+        $id = $req->params->id_venta;
+        // verifico que exista
+        $sale = $this->model->getSale($id);
+
+        if (!$sale) {
+            return $this->view->response("La tarea con el id=$id no existe", 404);
+        }
+
+        // Validación de campos vacíos
+        if (empty($req->body->inmueble) || empty($req->body->fecha_venta) || empty($req->body->precio) || empty($req->body->id_vendedor) || empty($req->body->url_foto)) {
+            return $this->view->response('Todos los campos son obligatorios.', 400);
+        }
+
+        $inmueble = $req->body->inmueble;
+        $date = $req->body->fecha_venta;
+        $price = $req->body->precio;
+        $id_vendedor = $req->body->id_vendedor;
+        $image = $req->body->foto_url;
+
+        // Actualiza la venta
+        $this->model->updateSale($id, $inmueble, $date, $price, $id_vendedor, $image);
+
+        // obtengo la venta modificada y la devuelvo en la respuesta
+        $sale = $this->model->getSale($id);
+        $this->view->response($sale, 200);
+    }
 }
-    
