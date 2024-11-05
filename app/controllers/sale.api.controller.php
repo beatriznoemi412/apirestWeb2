@@ -51,12 +51,12 @@ class SaleApiController
 
         // Validación de la página
         if ($page < 1) {
-            $page = 1; // Forzar a la primera página si se proporciona un valor menor
+            $page = 1; // Fuerza a la primera página si se proporciona un valor menor
         }
 
         // Validación del límite
         if ($limit < 1) {
-            $limit = 10; // Establecer un límite predeterminado
+            $limit = 10; // Establece un límite predeterminado
         }
 
         // Cálculo del offset
@@ -97,7 +97,7 @@ class SaleApiController
         if (isset($_GET['start_date'])) {
             $startDate = $_GET['start_date'];
             if (!$this->isValidDate($startDate)) {
-                return $this->view->response(['error' => 'Fecha de inicio no válida. Debe estar en formato YYYY-MM-DD y ser una fecha real.'], 400);
+                return $this->view->response('Fecha de inicio no válida. Debe estar en formato YYYY-MM-DD y ser una fecha real.', 400);
             }
             $filters[] = "fecha_venta >= :start_date";
             $params[':start_date'] = $startDate;
@@ -107,16 +107,17 @@ class SaleApiController
         if (isset($_GET['end_date'])) {
             $endDate = $_GET['end_date'];
             if (!$this->isValidDate($endDate)) {
-                return $this->view->response(['error' => 'Fecha de fin no válida. Debe estar en formato YYYY-MM-DD y ser una fecha real.'], 400);
+                return $this->view->response('Fecha de fin no válida. Debe estar en formato YYYY-MM-DD y ser una fecha real.', 400);
             }
 
             // Valida que end_date no sea anterior a start_date
             if (isset($startDate) && $startDate > $endDate) {
-                return $this->view->response(['error' => 'La fecha de fin no puede ser anterior a la fecha de inicio.'], 400);
+                return $this->view->response('La fecha de fin no puede ser anterior a la fecha de inicio.', 400);
             }
 
-            $filters[] = "fecha_venta <= :end_date";
+            $filters[] = "fecha_venta <= :end_date";//:end_date es un marcador de posición que se utilizará en una consulta SQL. Los marcadores de posición se usan para sustituir valores en una consulta de manera segura y eficiente.
             $params[':end_date'] = $endDate;
+        
         }
         // Obtiene ventas con filtros y paginación
         try {
@@ -168,7 +169,7 @@ class SaleApiController
         $sale = $this->model->getSale($id);
 
         if (!$sale) {
-            return $this->view->response(['error' => 'Venta no encontrada'], 404);
+            return $this->view->response('Venta no encontrada', 404);
         }
 
         return $this->view->response($sale);
@@ -181,14 +182,23 @@ class SaleApiController
                 return $this->view->response('Todos los campos son obligatorios.', 400);
             }
             //obtengo datos
+           
             $inmueble = $req->body->inmueble;
             $date = $req->body->fecha_venta;
             $price = $req->body->precio;
             $id_vendedor = $req->body->id_vendedor;
             $image = $req->body->foto_url;
 
-            if (!filter_var($image, FILTER_VALIDATE_URL)) {
+            if (!filter_var($image, FILTER_VALIDATE_URL)) {//filter_var($url, FILTER_VALIDATE_URL) valida si la variable $url contiene una URL bien estructurada.filter_var es una función predefinida en PHP. Se utiliza principalmente para validar y sanitizar datos
                 return $this->view->response('La URL de la imagen no es válida.', 400);
+            }
+            // Verifica si el vendedor existe
+            if (!$this->sellerModel->getSeller($id_vendedor)) {
+                return $this->view->response('No hay vendedores disponibles con ese ID.', 404);
+            }
+            // Verifica si ya existe una venta con los mismos parámetros
+                if ($this->model->saleExists($inmueble, $date, $price, $id_vendedor, $image)) {
+                return $this->view->response('La venta ya existe.', 409); // Conflict
             }
             //inserto datos
             $id = $this->model->insertSale($inmueble, $date, $price, $id_vendedor, $image);

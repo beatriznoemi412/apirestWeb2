@@ -63,7 +63,7 @@ Cuerpo de la Solicitud (JSON):
 }
 Posibles Respuestas:
 
-201 Created: La venta fue creada exitosamente y devuelve el objeto de la venta.
+201 Created:  devuelve el objeto de la venta.
 
 {
     "id": 77,
@@ -84,6 +84,10 @@ Posibles Respuestas:
 500 Internal Server Error: Error en la inserción de la venta.
 {
     "Error al insertar tarea"
+}
+409 Conflicto: Error en la inserción de la venta, evita duplicación de venta.
+{
+    "La venta ya existe"
 }
 - Se edita una venta existente
 Endpoint: /venta/:id_venta
@@ -188,9 +192,9 @@ GET https://localhost/web2-ApiRest/api/venta?sortField=id_vendedor&sortOrder=des
 
 Orden Ascendente por Fecha:
 
-GET https://localhost/web2-ApiRest/api/venta?sortField=fecha&sortOrder=asc
+GET https://localhost/web2-ApiRest/api/venta?sortField=fecha_venta&sortOrder=asc
 
-GET https://localhost/web2-ApiRest/api/venta?sortField=fecha&sortOrder=desc
+GET https://localhost/web2-ApiRest/api/venta?sortField=fecha_venta&sortOrder=desc
 Orden descendente por fecha.
 
 La API permite combinar estos filtros y el orden en una sola solicitud. Por ejemplo, para obtener ventas con un precio entre 100,000 y 500,000, realizadas por el vendedor con ID 3, en el año 2023, ordenadas de menor a mayor por precio, se puede utilizar:
@@ -202,7 +206,7 @@ Estos filtros y opciones de orden permiten a los usuarios personalizar los resul
 - PAGINACION
 Para solicitar una lista paginada de ventas, puedes realizar una solicitud GET al endpoint correspondiente y agregar los parámetros limit y page a la URL
 
-GET http://localhost:8000/api/ventas?limit=10&page=2
+GET https://localhost/web2-ApiRest/api/venta?limit=10&page=1
 limit=10: La respuesta incluirá un máximo de 10 registros.
 page=2: Se devolverán los registros correspondientes a la segunda página.
 Cuando se utilizan parámetros de paginación como limit y offset, el proceso es el siguiente:
@@ -215,7 +219,7 @@ El offset se calcula automáticamente utilizando la siguiente fórmula:
 $offset = ($page - 1) * $limit;
 Por ejemplo:
 
-Si page=2 y limit=10, el offset será 10, lo que significa que se omitirán los primeros 10 registros y se comenzará a recuperar desde el 11º registro.
+Si page=2 y limit=3, el offset será 10, lo que significa que se omitirán los primeros 10 registros y se comenzará a recuperar desde el 11º registro.
 
 
 
