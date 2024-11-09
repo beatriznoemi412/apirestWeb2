@@ -24,7 +24,7 @@ class SaleApiController
     //api/venta
     public function getAllSales($req, $res)
     {
-        // Parámetros permitidos
+        // Parámetros permitidos que acepta la API. Se colocan manualmente como una forma de proteger la API
         $allowedParams = ['sortField', 'sortOrder', 'page', 'limit', 'min_price', 'max_price', 'id_vendedor', 'start_date', 'end_date', 'resource', 'id_venta'];
 
         // Obtener parámetros de la solicitud
@@ -68,9 +68,9 @@ class SaleApiController
 
         // Filtra por precio
         if (isset($_GET['min_price'])) {
-            $minPrice = filter_var($_GET['min_price'], FILTER_VALIDATE_FLOAT);
+            $minPrice = filter_var($_GET['min_price'], FILTER_VALIDATE_FLOAT);//filter_var verifica y sanitiza
             if ($minPrice !== false) {
-                $filters[] = "precio >= :min_price"; // Usa la columna "precio"
+                $filters[] = "precio >= :min_price"; // :min_price marcador de posicion que será usado después
                 $params[':min_price'] = $minPrice; // Agrega parámetro
             }
         }
@@ -174,7 +174,7 @@ class SaleApiController
 
         return $this->view->response($sale);
     }
-    //api/venta/:id (POST)
+    //api/venta (POST)
     public function addSale($req, $res)
     {   //valido datos
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

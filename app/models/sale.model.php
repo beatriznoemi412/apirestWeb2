@@ -84,7 +84,7 @@ class SaleModel
         $query = $this->db->prepare($sql);
 
         // Vincula los valores de los filtros
-        foreach ($filters as $key => $value) {
+        foreach ($filters as $key => $value) {//recorre nuevamente el array $filters y vincula cada filtro con su marcador de posición en la consulta SQL. Usa el método bindValue() de PDO, que asocia el valor de cada filtro a su respectivo marcador de posición (:$key).
             if (in_array($key, ['min_price', 'max_price', 'id_vendedor', 'start_date', 'end_date'])) {
                 $query->bindValue(":$key", $value);
             }

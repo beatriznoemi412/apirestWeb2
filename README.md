@@ -176,7 +176,7 @@ desc: Orden descendente (de mayor a menor).
 Parámetro de Campo de Orden (sortField):
 precio: Ordenar por precio.
 id_vendedor: Ordenar por ID del vendedor.
-fecha: Ordenar por fecha de venta.
+fecha_venta: Ordenar por fecha de venta.
 Ejemplos de Endpoints
 Orden Ascendente por Precio:
 
