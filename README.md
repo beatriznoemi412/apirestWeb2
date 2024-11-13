@@ -2,8 +2,30 @@ INTEGRANTES
  .Lucia Micaela Moreira 
  .Beatriz Noemí Muñoz
 
+URL- GITHUB: https://github.com/beatriznoemi412/apirestWeb2.git
 
-APi REST FULL
+APi REST FULL:
+- Router
+
+Este archivo configura un enrutador para gestionar las solicitudes HTTP dirigidas a distintos puntos de la API relacionados con las ventas. El Router maneja varias rutas (routes) que permiten realizar operaciones CRUD (Crear, Leer, Actualizar) sobre las ventas.
+
+Definición de Rutas
+Se utiliza una instancia de la clase Router para definir las rutas de la API. Cada ruta está asociada a una combinación de:
+
+Un endpoint (por ejemplo, 'venta' o 'venta/:id_venta').
+Un método HTTP (como GET, POST, PUT).
+Un controlador (como SaleApiController).
+Una función en ese controlador (como getAllSales, get, addSale, editSale).
+
+Ejecución de la Ruta
+La llamada a $router->route($_GET['resource'], $_SERVER['REQUEST_METHOD']); permite al Router encontrar y ejecutar la función correspondiente en el controlador basado en:
+
+El recurso solicitado (obtenido a través de $_GET['resource']).
+El método HTTP usado para la solicitud (como $_SERVER['REQUEST_METHOD']).
+De esta manera, el Router redirige cada solicitud HTTP a la función apropiada, basada en las rutas definidas.
+
+RUTAS:
+
 - Se obtienen todas las ventas
 Endpoint: /venta
 Método HTTP: GET

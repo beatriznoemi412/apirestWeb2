@@ -140,7 +140,7 @@ class SaleApiController
                 'total_ventas' => $totalSales,
                 'total_paginas' => ceil($totalSales / $limit),
             ];
-
+            $res->setStatusCode(200); 
             $res->setBody($response);
             return $res->send();
         } catch (Exception $e) {
