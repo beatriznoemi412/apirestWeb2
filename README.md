@@ -4,32 +4,52 @@ INTEGRANTES
 
 URL- GITHUB: https://github.com/beatriznoemi412/apirestWeb2.git
 
-APi REST FULL:
-- Router
+                                                APi REST FULL
 
-Este archivo configura un enrutador para gestionar las solicitudes HTTP dirigidas a distintos puntos de la API relacionados con las ventas. El Router maneja varias rutas (routes) que permiten realizar operaciones CRUD (Crear, Leer, Actualizar) sobre las ventas.
+# API de Gestión de Ventas  
 
-Definición de Rutas
-Se utiliza una instancia de la clase Router para definir las rutas de la API. Cada ruta está asociada a una combinación de:
+Esta API permite realizar operaciones CRUD (Crear, Leer, Actualizar y Eliminar) relacionadas con las ventas. Diseñada para ser fácil de integrar y utilizar, es una herramienta ideal para gestionar registros de ventas en cualquier negocio.  
 
-Un endpoint (por ejemplo, 'venta' o 'venta/:id_venta').
-Un método HTTP (como GET, POST, PUT).
-Un controlador (como SaleApiController).
-Una función en ese controlador (como getAllSales, get, addSale, editSale).
+---
 
-Ejecución de la Ruta
-La llamada a $router->route($_GET['resource'], $_SERVER['REQUEST_METHOD']); permite al Router encontrar y ejecutar la función correspondiente en el controlador basado en:
+## Índice  
 
-El recurso solicitado (obtenido a través de $_GET['resource']).
-El método HTTP usado para la solicitud (como $_SERVER['REQUEST_METHOD']).
-De esta manera, el Router redirige cada solicitud HTTP a la función apropiada, basada en las rutas definidas.
--------------------------------------------------------------------------------------------------------------
+1. [Introducción](#introducción)  
+2. [Uso de la API](#uso-de-la-api)  
+   - [Obtener todas las ventas](#obtener-todas-las-ventas)
+     - [Ordenamiento](#ordenamiento)
+     - [Filtros y Ordenamiento](#filtros-y-ordenamiento-de-ventas)
+     - [Paginacion](#paginacion)
+   - [Obtener una venta por ID](#metodo-get)  
+   - [Crear una nueva venta](#metodo-post)  
+   - [Editar una venta existente](#metodo-put)  
+   - [Eliminar una venta](#metodo-delete)  
+3. [Errores comunes](#posible-error)
+  -[Errores comunes](#posible-error-filtro)   
+  -[Error 500](#error-500)
+  -[Errores metodo get](#errores-metodo-get)
+  -[Posibles respuestas y errores en Post](#posibles-respuestas-y-errores)
+  -[Posibles respuestas y errores en Put](#posibles-respuestas-y-errores-put)
+
+---
+
+## Introducción  
+
+La API de Gestión de Ventas ofrece los siguientes beneficios:  
+
+- Gestión de ventas mediante operaciones CRUD.  
+- Soporte para paginación y parámetros opcionales.  
+- Integración sencilla con sistemas externos gracias a RESTful design.  
+
+## Uso de la API  
+
+### Obtener todas las ventas  
 - METODO getAllSales(app/controllers/sale.api.controller.php)
-RUTAS:
 
-- Se obtienen todas las ventas
-Endpoint: /venta
-Método HTTP: GET
+- **Endpoint**: `/api/venta`  
+- **Método HTTP**: `GET`  
+- **Descripción**: Devuelve una lista paginada de ventas.  
+
 Descripción: Este endpoint permite obtener todas las ventas registradas.
 Respuesta: Retorna un array de objetos que representan las ventas, 3 por página.
 Ejemplo de respuesta:json
@@ -53,7 +73,7 @@ Ejemplo de respuesta:json
 ]
                                      ------------------------
 
-- Ordenamiento
+### Ordenamiento
 El ordenamiento se realiza sobre los campos precio, id_vendedor y fecha, permitiendo al usuario especificar si desea ordenar en orden ascendente (asc) o descendente (desc).
 
 Parámetro de Orden (sortOrder):
@@ -66,41 +86,42 @@ fecha_venta: Ordenar por fecha de venta.
 Ejemplos de Endpoints
 Orden Ascendente por Precio:
 
-GET https://localhost/web2-ApiRest/api/venta?sortField=precio&sortOrder=asc
+GET  /api/venta?sortField=precio&sortOrder=asc
 
-GET https://localhost/web2-ApiRest/api/venta?sortField=precio&sortOrder=desc
+GET  /api/venta?sortField=precio&sortOrder=desc
 
 Orden Ascendente por ID del Vendedor:
 
-GET https://localhost/web2-ApiRest/api/venta?sortField=id_vendedor&sortOrder=asc
+GET /api/venta?sortField=id_vendedor&sortOrder=asc
 
-GET https://localhost/web2-ApiRest/api/venta?sortField=id_vendedor&sortOrder=desc
+GET /api/venta?sortField=id_vendedor&sortOrder=desc
 
 Orden Ascendente por Fecha:
 
-GET https://localhost/web2-ApiRest/api/venta?sortField=fecha_venta&sortOrder=asc
+GET /api/venta?sortField=fecha_venta&sortOrder=asc
 
-GET https://localhost/web2-ApiRest/api/venta?sortField=fecha_venta&sortOrder=desc
+GET /api/venta?sortField=fecha_venta&sortOrder=desc
 Orden descendente por fecha.
                                      ------------------------
 
-- Filtros y Ordenamiento de Ventas en SaleApiController
+### Filtros y Ordenamiento de Ventas
 La API permite a los usuarios obtener una lista de ventas con distintos filtros y un orden personalizado. A continuación, se describen los parámetros de filtro y orden que se pueden usar, junto con ejemplos de cómo hacer estas solicitudes.
 
-Filtros Disponibles:
+- Filtros Disponibles:
 1)Filtrar por Precio Mínimo y Máximo (min_price y max_price)
 
 Permite obtener ventas cuyo precio esté dentro de un rango específico.
 Ejemplo:
-GET https://localhost/web2-ApiRest/api/venta?min_price=100000&max_price=500000
+GET /api/venta?min_price=100000&max_price=500000
 Descripción: Este endpoint devolverá todas las ventas cuyo precio esté entre 100000 y 500000 U$S.
 
 2)Filtra las ventas según el ID del vendedor.
 Ejemplo:
-GET https://localhost/web2-ApiRest/api/venta?id_vendedor=3
+GET /api/venta?id_vendedor=3
 Descripción: Este endpoint devolverá todas las ventas realizadas por el vendedor con ID 3.
 
-Posible error-Código HTTP: 400. El id_vendedor no es número entero válido:
+### Posible error
+Código HTTP: 400. El id_vendedor no es número entero válido:
 json:
 {
   "ID de vendedor inválido. Debe ser un número entero."
@@ -109,10 +130,11 @@ json:
 3)Filtrar por Rango de Fechas (start_date y end_date)
 Permite obtener ventas dentro de un rango de fechas específico.
 Ejemplo:
-GET https://localhost/web2-ApiRest/api/venta?start_date=2023-01-01&end_date=2023-12-31
+GET /api/venta?start_date=2023-01-01&end_date=2023-12-31
 Descripción: Este endpoint devolverá todas las ventas registradas entre el 1 de enero de 2023 y el 31 de diciembre de 2023.
 
-Posible Error-Código HTTP: 400. Fecha de inicio y fecha de fin no válidas. Deben estar en formato YYYY-MM-DD y ser fecha real.
+### Posible Error Filtro
+Código HTTP: 400. Fecha de inicio y fecha de fin no válidas. Deben estar en formato YYYY-MM-DD y ser fecha real.
 Ejemplo json:
 
 {
@@ -123,15 +145,15 @@ Ejemplo json:
 
 La API permite combinar estos filtros y el orden en una sola solicitud. Por ejemplo, para obtener ventas con un precio entre 100,000 y 500,000, realizadas por el vendedor con ID 3, en el año 2023, ordenadas de menor a mayor por precio, se puede utilizar:
 
-GET https://localhost/web2-ApiRest/api/venta?min_price=100000&max_price=500000&id_vendedor=3&start_date=2023-01-01&end_date=2024-12-31&sortField=precio&sortOrder=asc
+GET /api/venta?min_price=100000&max_price=500000&id_vendedor=3&start_date=2023-01-01&end_date=2024-12-31&sortField=precio&sortOrder=asc
 
 Estos filtros y opciones de orden permiten a los usuarios personalizar los resultados de acuerdo a sus necesidades, facilitando la consulta de datos específicos de ventas.
 
                                       ------------------------
-- PAGINACION
+### PAGINACION
 Para solicitar una lista paginada de ventas, puedes realizar una solicitud GET al endpoint correspondiente y agregar los parámetros limit y page a la URL
 
-GET https://localhost/web2-ApiRest/api/venta?limit=10&page=1
+GET /api/venta?limit=10&page=1
 limit=10: La respuesta incluirá un máximo de 10 registros.
 page=2: Se devolverán los registros correspondientes a la segunda página.
 Cuando se utilizan parámetros de paginación como limit y offset, el proceso es el siguiente:
@@ -146,12 +168,14 @@ Por ejemplo:
 
 Si page=2 y limit=3, el offset será 10, lo que significa que se omitirán los primeros 10 registros y se comenzará a recuperar desde el 11º registro.
 
-- Error 500 - Error Interno del Servidor (Internal Server Error)
+### Error 500  
+Error Interno del Servidor (Internal Server Error)
 Error al procesar la solicitud. Intenta más tarde.
 Este error ocurre cuando hay un problema inesperado en el servidor (por ejemplo, un fallo en la base de datos o un error en la lógica de procesamiento).
 -------------------------------------------------------------------------------------------------------------
 
-- METODO: get($req, $res)(app/controllers/sale.api.controller.php)
+### METODO GET
+(app/controllers/sale.api.controller.php)
 - Se obtiene una venta por ID
 Endpoint: /venta/:id_venta
 Método HTTP: GET
@@ -168,13 +192,14 @@ Ejemplo de solicitud: /venta/1
   "id_vendedor": 3,
   "foto_url": "https://cdn.pixabay.com/photo/2014/09/04/05/54/construction-435302_1280.jpg"
 }
+### ERRORES METODO GET
 CODIGO HTTP: 400:
-Si id no es un número entero : https://localhost/web2-ApiRest/api/venta/2"e5
+Si id no es un número entero : /api/venta/2"e5
 {
   "El ID de venta es inválido. Debe ser un número entero positivo."
 }
 CODIGO HTTP: 404:
-Indica que no se ha encontrado el recurso solicitado en el servidor, por ejemplo que id_venta no exista : https://localhost/web2-ApiRest/api/venta/768
+Indica que no se ha encontrado el recurso solicitado en el servidor, por ejemplo que id_venta no exista : api/venta/768
 {
   "Venta no encontrada"
 }
@@ -191,11 +216,11 @@ total_paginas: Indica el número total de páginas que se pueden mostrar según 
 
 -------------------------------------------------------------------------------------------------------------
 
-- METODO POST
+### METODO POST
 Para crear una venta, se debe enviar una solicitud POST con los datos en el cuerpo de la solicitud (JSON):
 
 Endpoint: /venta
-URL: https://localhost/web2-ApiRest/api/venta  Método: POST
+URL: /api/venta  Método: POST
 
 Cuerpo de la Solicitud (JSON):
 
@@ -206,7 +231,7 @@ Cuerpo de la Solicitud (JSON):
     "id_vendedor": 3,
     "image": "https://example.com/image.jpg"
 }
-Posibles Respuestas y errores:
+### POSIBLES RESPUESTAS Y ERRORES 
 
 201 Created:  devuelve el objeto de la venta.
 
@@ -237,7 +262,7 @@ Posibles Respuestas y errores:
 
 -------------------------------------------------------------------------------------------------------------
 
-- METODO PUT
+### METODO PUT
 - Se edita una venta existente
 Endpoint: /venta/:id_venta
 Método HTTP: PUT
@@ -272,7 +297,7 @@ json, ej.:
   "id_vendedor": 101,
   "url_foto": "http://ejemplo.com/foto.jpg"
 }
-Posibles respuestas y errores:
+### POSIBLES RESPUESTAS Y ERRORES PUT
 
 200 OK: La venta fue actualizada exitosamente.
 {
@@ -296,7 +321,8 @@ json
 
 -------------------------------------------------------------------------------------------------------------
 
-- METODO DELETE
+### METODO DELETE
+Endpoint: api/venta/:id
 Elimina la venta correspondiente al ID solicitado.
 Error 404: Si el id no existe.
 
