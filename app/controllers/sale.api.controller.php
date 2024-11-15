@@ -285,4 +285,14 @@ class SaleApiController
         $sale = $this->model->getSale($id);
         $this->view->response($sale, 200);
     }
+    public function deleteSale($req, $res)
+    {
+        $id = $req->params->id_venta;
+        $sale = $this->model->getSale($id);
+        if (!$sale) {
+            return $this->view->response("El producto con el id=$id no existe", 404);
+        }
+        $saleDeleted = $this->model->removeSale($id);
+        $this->view->response($saleDeleted, 200);
+    }
 }

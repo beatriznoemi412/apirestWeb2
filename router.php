@@ -15,6 +15,7 @@ $router->addRoute('venta',                    'GET', 'SaleApiController',    'ge
 $router->addRoute('venta/:id_venta',          'GET', 'SaleApiController',    'get');
 $router->addRoute('venta',                    'POST','SaleApiController',   'addSale');
 $router->addRoute('venta/:id_venta',          'PUT', 'SaleApiController',   'editSale');
+$router->addRoute('venta/:id_venta',          'DELETE', 'SaleApiController',   'deleteSale');
 
 $router->route($_GET['resource'], $_SERVER['REQUEST_METHOD']);
 

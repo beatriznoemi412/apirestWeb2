@@ -23,7 +23,7 @@ La llamada a $router->route($_GET['resource'], $_SERVER['REQUEST_METHOD']); perm
 El recurso solicitado (obtenido a través de $_GET['resource']).
 El método HTTP usado para la solicitud (como $_SERVER['REQUEST_METHOD']).
 De esta manera, el Router redirige cada solicitud HTTP a la función apropiada, basada en las rutas definidas.
-
+-------------------------------------------------------------------------------------------------------------
 - METODO getAllSales(app/controllers/sale.api.controller.php)
 RUTAS:
 
@@ -51,6 +51,8 @@ Ejemplo de respuesta:json
       "foto_url": "https://cdn.pixabay.com/photo/2016/09/23/10/20/cottage-1689224_1280.jpg"
     },
 ]
+                                     ------------------------
+
 - Ordenamiento
 El ordenamiento se realiza sobre los campos precio, id_vendedor y fecha, permitiendo al usuario especificar si desea ordenar en orden ascendente (asc) o descendente (desc).
 
@@ -80,6 +82,7 @@ GET https://localhost/web2-ApiRest/api/venta?sortField=fecha_venta&sortOrder=asc
 
 GET https://localhost/web2-ApiRest/api/venta?sortField=fecha_venta&sortOrder=desc
 Orden descendente por fecha.
+                                     ------------------------
 
 - Filtros y Ordenamiento de Ventas en SaleApiController
 La API permite a los usuarios obtener una lista de ventas con distintos filtros y un orden personalizado. A continuación, se describen los parámetros de filtro y orden que se pueden usar, junto con ejemplos de cómo hacer estas solicitudes.
@@ -124,6 +127,7 @@ GET https://localhost/web2-ApiRest/api/venta?min_price=100000&max_price=500000&i
 
 Estos filtros y opciones de orden permiten a los usuarios personalizar los resultados de acuerdo a sus necesidades, facilitando la consulta de datos específicos de ventas.
 
+                                      ------------------------
 - PAGINACION
 Para solicitar una lista paginada de ventas, puedes realizar una solicitud GET al endpoint correspondiente y agregar los parámetros limit y page a la URL
 
@@ -145,6 +149,7 @@ Si page=2 y limit=3, el offset será 10, lo que significa que se omitirán los p
 - Error 500 - Error Interno del Servidor (Internal Server Error)
 Error al procesar la solicitud. Intenta más tarde.
 Este error ocurre cuando hay un problema inesperado en el servidor (por ejemplo, un fallo en la base de datos o un error en la lógica de procesamiento).
+-------------------------------------------------------------------------------------------------------------
 
 - METODO: get($req, $res)(app/controllers/sale.api.controller.php)
 - Se obtiene una venta por ID
@@ -183,6 +188,8 @@ limite: Define cuántos resultados se pueden mostrar por página. En este caso, 
 total_ventas: Es el número total de ventas en el sistema o base de datos. En este caso, hay un total de 7 ventas disponibles (total_ventas: 7).
 
 total_paginas: Indica el número total de páginas que se pueden mostrar según el límite de ventas por página. Con un total de 7 ventas y un límite de 3 ventas por página, hay 3 páginas en total.
+
+-------------------------------------------------------------------------------------------------------------
 
 - METODO POST
 Para crear una venta, se debe enviar una solicitud POST con los datos en el cuerpo de la solicitud (JSON):
@@ -227,6 +234,8 @@ Posibles Respuestas y errores:
 {
     "Error al insertar tarea"
 }
+
+-------------------------------------------------------------------------------------------------------------
 
 - METODO PUT
 - Se edita una venta existente
@@ -285,6 +294,10 @@ json
   "Hubo un problema al actualizar la venta."
 }
 
+-------------------------------------------------------------------------------------------------------------
 
+- METODO DELETE
+Elimina la venta correspondiente al ID solicitado.
+Error 404: Si el id no existe.
 
 

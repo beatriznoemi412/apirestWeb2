@@ -98,4 +98,8 @@ class SaleModel
         $query = $this->db->prepare('UPDATE venta SET inmueble = ?, fecha_venta = ?, precio = ?, id_vendedor = ?, foto_url = ? WHERE id_venta = ?');
         $query->execute([$inmueble, $date, $price, $id_vendedor, $image, $id]);
     }
+    public function removeSale($id){
+        $query= $this->db->prepare('DELETE FROM venta WHERE id_venta = ?');
+        $query->execute([$id]);
+    }
 }
