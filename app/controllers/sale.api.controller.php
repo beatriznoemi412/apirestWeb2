@@ -68,7 +68,7 @@ class SaleApiController
 
         // Filtra por precio
         if (isset($_GET['min_price'])) {
-            $minPrice = filter_var($_GET['min_price'], FILTER_VALIDATE_FLOAT);//filter_var verifica y sanitiza
+            $minPrice = filter_var($_GET['min_price'], FILTER_VALIDATE_FLOAT); //filter_var verifica y sanitiza
             if ($minPrice !== false) {
                 $filters[] = "precio >= :min_price"; // :min_price marcador de posicion que será usado después
                 $params[':min_price'] = $minPrice; // Agrega parámetro
@@ -115,9 +115,8 @@ class SaleApiController
                 return $this->view->response('La fecha de fin no puede ser anterior a la fecha de inicio.', 400);
             }
 
-            $filters[] = "fecha_venta <= :end_date";//:end_date es un marcador de posición que se utilizará en una consulta SQL. Los marcadores de posición se usan para sustituir valores en una consulta de manera segura y eficiente.
+            $filters[] = "fecha_venta <= :end_date"; //:end_date es un marcador de posición que se utilizará en una consulta SQL. Los marcadores de posición se usan para sustituir valores en una consulta de manera segura y eficiente.
             $params[':end_date'] = $endDate;
-        
         }
         // Obtiene ventas con filtros y paginación
         try {
@@ -140,7 +139,7 @@ class SaleApiController
                 'total_ventas' => $totalSales,
                 'total_paginas' => ceil($totalSales / $limit),
             ];
-            $res->setStatusCode(200); 
+            $res->setStatusCode(200);
             $res->setBody($response);
             return $res->send();
         } catch (Exception $e) {
@@ -166,13 +165,18 @@ class SaleApiController
     public function get($req, $res)
     {
         $id = $req->params->id_venta;
+
+        // Validar que id_venta no esté vacío y sea un número entero positivo
+        if (empty($id) || !is_numeric($id) || $id <= 0) {
+            return $this->view->response('El ID de venta es inválido. Debe ser un número entero positivo.', 400);
+        }
         $sale = $this->model->getSale($id);
 
         if (!$sale) {
             return $this->view->response('Venta no encontrada', 404);
         }
 
-        return $this->view->response($sale);
+        return $this->view->response($sale, 200);
     }
     //api/venta (POST)
     public function addSale($req, $res)
@@ -182,14 +186,45 @@ class SaleApiController
                 return $this->view->response('Todos los campos son obligatorios.', 400);
             }
             //obtengo datos
-           
+
             $inmueble = $req->body->inmueble;
             $date = $req->body->fecha_venta;
             $price = $req->body->precio;
             $id_vendedor = $req->body->id_vendedor;
             $image = $req->body->foto_url;
 
-            if (!filter_var($image, FILTER_VALIDATE_URL)) {//filter_var($url, FILTER_VALIDATE_URL) valida si la variable $url contiene una URL bien estructurada.filter_var es una función predefinida en PHP. Se utiliza principalmente para validar y sanitizar datos
+            // Validar que los campos obligatorios no estén vacíos
+            if (empty($inmueble)) {
+                return $this->view->response('El campo "inmueble" es obligatorio.', 400);
+            }
+
+            if (empty($date)) {
+                return $this->view->response('El campo "fecha_venta" es obligatorio.', 400);
+            }
+
+            if (empty($price)) {
+                return $this->view->response('El campo "precio" es obligatorio.', 400);
+            }
+
+            if (empty($id_vendedor)) {
+                return $this->view->response('El campo "id_vendedor" es obligatorio.', 400);
+            }
+
+            if (empty($image)) {
+                return $this->view->response('El campo "foto_url" es obligatorio.', 400);
+            }
+
+            // Validar que el precio sea un número positivo
+            if (!is_numeric($price) || $price <= 0) {
+                return $this->view->response('El precio debe ser un número positivo.', 400);
+            }
+
+            // Validar que el ID del vendedor sea un número positivo
+            if (!is_numeric($id_vendedor) || $id_vendedor <= 0) {
+                return $this->view->response('El ID del vendedor no es válido.', 400);
+            }
+
+            if (!filter_var($image, FILTER_VALIDATE_URL)) { //filter_var($url, FILTER_VALIDATE_URL) valida si la variable $url contiene una URL bien estructurada.filter_var es una función predefinida en PHP. Se utiliza principalmente para validar y sanitizar datos
                 return $this->view->response('La URL de la imagen no es válida.', 400);
             }
             // Verifica si el vendedor existe
@@ -197,8 +232,8 @@ class SaleApiController
                 return $this->view->response('No hay vendedores disponibles con ese ID.', 404);
             }
             // Verifica si ya existe una venta con los mismos parámetros
-                if ($this->model->saleExists($inmueble, $date, $price, $id_vendedor, $image)) {
-                return $this->view->response('La venta ya existe.', 409); // Conflict
+            if ($this->model->saleExists($inmueble, $date, $price, $id_vendedor, $image)) {
+                return $this->view->response('La venta ya existe.', 409); // Conflicto al crear recurso
             }
             //inserto datos
             $id = $this->model->insertSale($inmueble, $date, $price, $id_vendedor, $image);
@@ -225,7 +260,7 @@ class SaleApiController
         $sale = $this->model->getSale($id);
 
         if (!$sale) {
-            return $this->view->response("La tarea con el id=$id no existe", 404);
+            return $this->view->response("La venta con el id=$id no existe", 404);
         }
 
         // Validación de campos vacíos
@@ -240,8 +275,12 @@ class SaleApiController
         $image = $req->body->foto_url;
 
         // Actualiza la venta
-        $this->model->updateSale($id, $inmueble, $date, $price, $id_vendedor, $image);
-
+        $updated= $this->model->updateSale($id, $inmueble, $date, $price, $id_vendedor, $image);
+        
+         // Verificar si la actualización fue exitosa
+         if ($updated === false) {
+            return $this->view->response("Hubo un problema al actualizar la venta. Intente nuevamente.", 500);
+        }
         // obtengo la venta modificada y la devuelvo en la respuesta
         $sale = $this->model->getSale($id);
         $this->view->response($sale, 200);
