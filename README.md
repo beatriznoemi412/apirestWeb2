@@ -169,10 +169,10 @@ Por ejemplo:
 Si page=2 y limit=3, el offset será 10, lo que significa que se omitirán los primeros 10 registros y se comenzará a recuperar desde el 11º registro.
 
 ### Error 500  
-Error Interno del Servidor (Internal Server Error)
+"Error Interno del Servidor (Internal Server Error)
 Error al procesar la solicitud. Intenta más tarde.
-Este error ocurre cuando hay un problema inesperado en el servidor (por ejemplo, un fallo en la base de datos o un error en la lógica de procesamiento).
--------------------------------------------------------------------------------------------------------------
+Este error ocurre cuando hay un problema inesperado en el servidor (por ejemplo, un fallo en la base de datos o un error en la lógica de procesamiento)."
+
 
 ### METODO GET
 (app/controllers/sale.api.controller.php)
