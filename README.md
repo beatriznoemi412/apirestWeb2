@@ -101,8 +101,10 @@ La API de Gestión de Ventas ofrece los siguientes beneficios:
 
  GET /api/venta?sortField=fecha_venta&sortOrder=asc
 
- GET /api/venta?sortField=fecha_venta&sortOrder=desc
 - **Orden descendente por fecha**.
+
+ GET /api/venta?sortField=fecha_venta&sortOrder=desc
+
                                      ------------------------
 
 ### Filtros y Ordenamiento de Ventas
@@ -112,13 +114,22 @@ La API de Gestión de Ventas ofrece los siguientes beneficios:
 - 1)Filtrar por Precio Mínimo y Máximo (min_price y max_price)
 
  Permite obtener ventas cuyo precio esté dentro de un rango específico.
+
  Ejemplo:
+
+
  GET /api/venta?min_price=100000&max_price=500000
+
+
  Descripción: Este endpoint devolverá todas las ventas cuyo precio esté entre 100000 y 500000 U$S.
 
 - 2)Filtra las ventas según el ID del vendedor.
  Ejemplo:
+
+
  GET /api/venta?id_vendedor=3
+
+
  Descripción: Este endpoint devolverá todas las ventas realizadas por el vendedor con ID 3.
 
 
@@ -130,10 +141,19 @@ La API de Gestión de Ventas ofrece los siguientes beneficios:
 }
 
 - 3)Filtrar por Rango de Fechas (start_date y end_date)
+
+
  Permite obtener ventas dentro de un rango de fechas específico.
+
+
  Ejemplo:
+
+
  GET /api/venta?start_date=2023-01-01&end_date=2023-12-31
+
+
  Descripción: Este endpoint devolverá todas las ventas registradas entre el 1 de enero de 2023 y el 31 de diciembre de 2023.
+
 
 **Código HTTP: 400.** Fecha de inicio y fecha de fin no válidas. Deben estar en formato YYYY-MM-DD y ser fecha real.
 `Ejemplo json:`
@@ -145,7 +165,11 @@ La API de Gestión de Ventas ofrece los siguientes beneficios:
 
 
 - La API permite combinar estos filtros y el orden en una sola solicitud. Por ejemplo, para obtener ventas 
+
+
  con un precio entre 100,000 y 500,000, realizadas por el vendedor con ID 3, en el año 2023, ordenadas de 
+ 
+ 
  menor a mayor por precio, se puede utilizar:
 
  GET /api/venta?min_price=100000&max_price=500000&id_vendedor=3&start_date=2023-01-01&end_date=2024-12-31&sortField=precio&sortOrder=asc
@@ -172,7 +196,11 @@ La API de Gestión de Ventas ofrece los siguientes beneficios:
 
 ### Error 500  
  "Error Interno del Servidor (Internal Server Error)
+
+
  Error al procesar la solicitud. Intenta más tarde.
+
+
  Este error ocurre cuando hay un problema inesperado en el servidor (por ejemplo, un fallo en la base de datos o un error en la lógica de procesamiento)."
 
 
@@ -181,11 +209,20 @@ La API de Gestión de Ventas ofrece los siguientes beneficios:
 - Se obtiene una venta por ID
 - Endpoint: /venta/:id_venta
 Método HTTP: GET
+
+
 Descripción: Obtiene la información de una venta específica a partir de su ID.
+
+
 Parámetros:
+
 id_venta (obligatorio): El ID de la venta que se quiere consultar.
+
 Respuesta: Retorna un objeto con la información de la venta correspondiente.
+
 Ejemplo de solicitud: /venta/1
+
+
 {
   "id_venta": 34,
   "inmueble": "Departamento en pleno centro Tandil",
@@ -195,24 +232,43 @@ Ejemplo de solicitud: /venta/1
   "foto_url": "https://cdn.pixabay.com/photo/2014/09/04/05/54/construction-435302_1280.jpg"
 }
 ### ERRORES METODO GET
+
+
 **CODIGO HTTP: 400:**
+
+
 Si id no es un número entero : /api/venta/2"e5
+
+
 {
   "El ID de venta es inválido. Debe ser un número entero positivo."
 }
+
+
 **CODIGO HTTP: 404:**
+
+
 Indica que no se ha encontrado el recurso solicitado en el servidor, por ejemplo que id_venta no exista : api/venta/768
+
+
 {
   "Venta no encontrada"
 }
+
 - Si id no existe, se muestra:
+
+
 ventas: Es una lista vacía ([]), lo que indica que no hay datos disponibles para mostrar en esta consulta ya que no hay ventas con ese id.
+
 
 pagina: Indica que se está mostrando la primera página de resultados (pagina: 1).
 
+
 limite: Define cuántos resultados se pueden mostrar por página. En este caso, se están mostrando un máximo de 3 ventas por página (limite: 3).
 
+
 total_ventas: Es el número total de ventas en el sistema o base de datos. En este caso, hay un total de 7 ventas disponibles (total_ventas: 7).
+
 
 total_paginas: Indica el número total de páginas que se pueden mostrar según el límite de ventas por página. Con un total de 7 ventas y un límite de 3 ventas por página, hay 3 páginas en total.
 
@@ -221,10 +277,12 @@ total_paginas: Indica el número total de páginas que se pueden mostrar según 
 ### METODO POST
 Para crear una venta, se debe enviar una solicitud POST con los datos en el cuerpo de la solicitud (JSON):
 
-Endpoint: /venta
-URL: /api/venta  Método: POST
+- **Endpoint**: `/venta`
+- **URL**: `/api/venta  Método: POST`
+
 
 Cuerpo de la Solicitud (JSON):
+
 
 {
     "inmueble": "Apartamento en el centro",
@@ -233,9 +291,13 @@ Cuerpo de la Solicitud (JSON):
     "id_vendedor": 3,
     "image": "https://example.com/image.jpg"
 }
+
+
 ### POSIBLES RESPUESTAS Y ERRORES 
 
+
 **201 Created**:  devuelve el objeto de la venta.
+
 
 {
     "id": 77,
@@ -245,19 +307,35 @@ Cuerpo de la Solicitud (JSON):
     "id_vendedor": 3,
     "image": "https://example.com/image.jpg"
 }
+
+
 **400 Bad Request**: Todos los campos son obligatorios o el ID vendedor o la URL de la imagen no es válida.
+
+
 {
     "El campo " " es obligatorio."
 }
+
+
 **404 Not Found**: No hay vendedores disponibles para asignar la venta.
+
+
 {
     "No hay vendedores disponibles."
 }
+
+
 **409 Conflict**: Error en la inserción de la venta, evita duplicación de venta
+
+
 {
     "La venta ya existe."
 }
+
+
 **500 Internal Server Error**: Error en la inserción de la venta.
+
+
 {
     "Error al insertar tarea"
 }
@@ -266,15 +344,20 @@ Cuerpo de la Solicitud (JSON):
 
 ### METODO PUT
 - Se edita una venta existente
-Endpoint: /venta/:id_venta
-Método HTTP: PUT
-Descripción: Actualiza los detalles de una venta existente.
-Parámetros:
+**Endpoint**: `/venta/:id_venta,`
+**Método HTTP**: `PUT`
+**Descripción**: Actualiza los detalles de una venta existente.
+**Parámetros**:
+
+
 id (obligatorio): El ID de la venta a editar.
+
 
 Cuerpo de la solicitud: Debe incluir todos los campos obligatorios de la venta.
 
 json, ej.:
+
+
 {
   "inmueble": "Tipo de inmueble",
   "fecha_venta": "YYYY-MM-DD",
@@ -282,15 +365,29 @@ json, ej.:
   "id_vendedor": 123,
   "url_foto": "http://ejemplo.com/imagen.jpg"
 }
-Validaciones:
+
+
+**Validaciones**:
+
 
 Todos los campos en el cuerpo de la solicitud son obligatorios (inmueble, fecha_venta, precio, id_vendedor, url_foto).
+
+
 Si algún campo está vacío, el servidor responderá con un error 400 indicando que todos los campos son obligatorios.
+
+
 Si no se encuentra una venta con el id_venta especificado, el servidor devolverá un error 404.
+
+
 Ejemplo de solicitud:
 
+
 PUT /venta/1
+
+
 json, ej.:
+
+
 { 
   "id_venta":81;
   "inmueble": "Apartamento",
@@ -299,24 +396,43 @@ json, ej.:
   "id_vendedor": 101,
   "url_foto": "http://ejemplo.com/foto.jpg"
 }
+
+
 ### POSIBLES RESPUESTAS Y ERRORES PUT
 
 **200 OK**: La venta fue actualizada exitosamente.
+
+
 {
   "Devuelve el objeto actualizado"
 }
+
+
 **400 Bad Request**: Algún campo en el cuerpo de la solicitud está vacío.
+
+
 {
   "Todos los campos son obligatorios."
 }
+
+
 **404 Not Found**: No se encontró una venta con el id_venta especificado.
+
+
 json
+
 
 {
   "Venta con id=$id no existe."
 }
+
+
 **500 Internal Server Error**: Error al actualizar la venta.
+
+
 json
+
+
 {
   "Hubo un problema al actualizar la venta."
 }
@@ -325,7 +441,11 @@ json
 
 ### METODO DELETE
 Endpoint: api/venta/:id
+
+
 Elimina la venta correspondiente al ID solicitado.
+
+
 **Error 404**: Si el id no existe.
 
 
