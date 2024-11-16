@@ -38,10 +38,16 @@ class SaleApiController
         }
         // Ordenamiento
         $sortFields = ['precio', 'fecha_venta', 'id_vendedor'];
-        $userSortField = isset($_GET['sortField']) && in_array($_GET['sortField'], $sortFields)
-            ? $_GET['sortField']
-            : 'precio'; // campo de orden por defecto
+    
+        $userSortField = isset($_GET['sortField']) ? $_GET['sortField'] : null;
 
+        // Validar que sortField sea válido
+        if ($userSortField && !in_array($userSortField, $sortFields)) {
+            return $this->view->response('Campo de ordenamiento no permitido: ' . $userSortField, 400);
+        }
+
+        // Usar el campo de ordenamiento por defecto si no se proporciona
+        $userSortField = $userSortField ?: 'precio';
         // Obtiene el parámetro de orden del usuario (asc o desc) usando $_GET y usa 'asc' por defecto
         $userSortOrder = isset($_GET['sortOrder']) && $_GET['sortOrder'] === 'desc' ? 'desc' : 'asc';
 
@@ -275,10 +281,10 @@ class SaleApiController
         $image = $req->body->foto_url;
 
         // Actualiza la venta
-        $updated= $this->model->updateSale($id, $inmueble, $date, $price, $id_vendedor, $image);
-        
-         // Verificar si la actualización fue exitosa
-         if ($updated === false) {
+        $updated = $this->model->updateSale($id, $inmueble, $date, $price, $id_vendedor, $image);
+
+        // Verificar si la actualización fue exitosa
+        if ($updated === false) {
             return $this->view->response("Hubo un problema al actualizar la venta. Intente nuevamente.", 500);
         }
         // obtengo la venta modificada y la devuelvo en la respuesta
