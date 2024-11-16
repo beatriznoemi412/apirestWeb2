@@ -254,7 +254,7 @@ id_venta (obligatorio): El ID de la venta que se quiere consultar.
 
 Respuesta: Retorna un objeto con la información de la venta correspondiente.
 
-Ejemplo de solicitud: /venta/1
+Ejemplo de solicitud: /venta/34
 
 
 {
