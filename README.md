@@ -8,10 +8,6 @@ URL- GITHUB: https://github.com/beatriznoemi412/apirestWeb2.git
 
 # API de Gestión de Ventas  
 
-Esta API permite realizar operaciones CRUD (Crear, Leer, Actualizar y Eliminar) relacionadas con las ventas. Diseñada para ser fácil de integrar y utilizar, es una herramienta ideal para gestionar registros de ventas en cualquier negocio.  
-
----
-
 ## Índice  
 
 1. [Introducción](#introducción)  
@@ -34,6 +30,11 @@ Esta API permite realizar operaciones CRUD (Crear, Leer, Actualizar y Eliminar) 
 ---
 
 ## Introducción  
+La API de Gestión de Ventas es una solución desarrollada en PHP utilizando 
+el patrón de diseño MVC (Modelo-Vista-Controlador) y la biblioteca PDO para 
+la interacción segura con la base de datos. Esta API proporciona las 
+funcionalidades básicas de un CRUD (Crear, Leer, Actualizar, Eliminar)
+para gestionar registros de ventas en una inmobiliaria.
 
 La API de Gestión de Ventas ofrece los siguientes beneficios:  
 
@@ -76,7 +77,7 @@ Ejemplo de respuesta:json
 ### Ordenamiento
 El ordenamiento se realiza sobre los campos precio, id_vendedor y fecha, permitiendo al usuario especificar si desea ordenar en orden ascendente (asc) o descendente (desc).
 
-Parámetro de Orden (sortOrder):
+**Parámetro de Orden (sortOrder)**:
 asc: Orden ascendente (de menor a mayor).
 desc: Orden descendente (de mayor a menor).
 Parámetro de Campo de Orden (sortField):
@@ -154,6 +155,7 @@ Estos filtros y opciones de orden permiten a los usuarios personalizar los resul
 Para solicitar una lista paginada de ventas, puedes realizar una solicitud GET al endpoint correspondiente y agregar los parámetros limit y page a la URL
 
 GET /api/venta?limit=10&page=1
+
 limit=10: La respuesta incluirá un máximo de 10 registros.
 page=2: Se devolverán los registros correspondientes a la segunda página.
 Cuando se utilizan parámetros de paginación como limit y offset, el proceso es el siguiente:
