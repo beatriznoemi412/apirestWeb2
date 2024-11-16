@@ -20,8 +20,7 @@ URL- GITHUB: https://github.com/beatriznoemi412/apirestWeb2.git
    - [Crear una nueva venta](#metodo-post)  
    - [Editar una venta existente](#metodo-put)  
    - [Eliminar una venta](#metodo-delete)  
-3. [Errores comunes](#posible-error)
-  -[Errores comunes](#posible-error-filtro)   
+3. [Errores comunes](#posible-error)   
   -[Error 500](#error-500)
   -[Errores metodo get](#errores-metodo-get)
   -[Posibles respuestas y errores en Post](#posibles-respuestas-y-errores)
@@ -121,8 +120,9 @@ Ejemplo:
 GET /api/venta?id_vendedor=3
 Descripción: Este endpoint devolverá todas las ventas realizadas por el vendedor con ID 3.
 
+
 ### Posible error
-Código HTTP: 400. El id_vendedor no es número entero válido:
+**Código HTTP: 400.** El id_vendedor no es número entero válido:
 json:
 {
   "ID de vendedor inválido. Debe ser un número entero."
@@ -134,8 +134,7 @@ Ejemplo:
 GET /api/venta?start_date=2023-01-01&end_date=2023-12-31
 Descripción: Este endpoint devolverá todas las ventas registradas entre el 1 de enero de 2023 y el 31 de diciembre de 2023.
 
-### Posible Error Filtro
-Código HTTP: 400. Fecha de inicio y fecha de fin no válidas. Deben estar en formato YYYY-MM-DD y ser fecha real.
+**Código HTTP: 400.** Fecha de inicio y fecha de fin no válidas. Deben estar en formato YYYY-MM-DD y ser fecha real.
 Ejemplo json:
 
 {
@@ -144,11 +143,11 @@ Ejemplo json:
 
 
 
-La API permite combinar estos filtros y el orden en una sola solicitud. Por ejemplo, para obtener ventas con un precio entre 100,000 y 500,000, realizadas por el vendedor con ID 3, en el año 2023, ordenadas de menor a mayor por precio, se puede utilizar:
+La API permite combinar estos filtros y el orden en una sola solicitud. Por ejemplo, para obtener ventas 
+con un precio entre 100,000 y 500,000, realizadas por el vendedor con ID 3, en el año 2023, ordenadas de 
+menor a mayor por precio, se puede utilizar:
 
 GET /api/venta?min_price=100000&max_price=500000&id_vendedor=3&start_date=2023-01-01&end_date=2024-12-31&sortField=precio&sortOrder=asc
-
-Estos filtros y opciones de orden permiten a los usuarios personalizar los resultados de acuerdo a sus necesidades, facilitando la consulta de datos específicos de ventas.
 
                                       ------------------------
 ### PAGINACION
@@ -195,12 +194,12 @@ Ejemplo de solicitud: /venta/1
   "foto_url": "https://cdn.pixabay.com/photo/2014/09/04/05/54/construction-435302_1280.jpg"
 }
 ### ERRORES METODO GET
-CODIGO HTTP: 400:
+**CODIGO HTTP: 400:**
 Si id no es un número entero : /api/venta/2"e5
 {
   "El ID de venta es inválido. Debe ser un número entero positivo."
 }
-CODIGO HTTP: 404:
+**CODIGO HTTP: 404:**
 Indica que no se ha encontrado el recurso solicitado en el servidor, por ejemplo que id_venta no exista : api/venta/768
 {
   "Venta no encontrada"
@@ -235,7 +234,7 @@ Cuerpo de la Solicitud (JSON):
 }
 ### POSIBLES RESPUESTAS Y ERRORES 
 
-201 Created:  devuelve el objeto de la venta.
+**201 Created**:  devuelve el objeto de la venta.
 
 {
     "id": 77,
@@ -245,19 +244,19 @@ Cuerpo de la Solicitud (JSON):
     "id_vendedor": 3,
     "image": "https://example.com/image.jpg"
 }
-400 Bad Request: Todos los campos son obligatorios o el ID vendedor o la URL de la imagen no es válida.
+**400 Bad Request**: Todos los campos son obligatorios o el ID vendedor o la URL de la imagen no es válida.
 {
     "El campo " " es obligatorio."
 }
-404 Not Found: No hay vendedores disponibles para asignar la venta.
+**404 Not Found**: No hay vendedores disponibles para asignar la venta.
 {
     "No hay vendedores disponibles."
 }
-409 Conflict: Error en la inserción de la venta, evita duplicación de venta
+**409 Conflict**: Error en la inserción de la venta, evita duplicación de venta
 {
     "La venta ya existe."
 }
-500 Internal Server Error: Error en la inserción de la venta.
+**500 Internal Server Error**: Error en la inserción de la venta.
 {
     "Error al insertar tarea"
 }
@@ -301,21 +300,21 @@ json, ej.:
 }
 ### POSIBLES RESPUESTAS Y ERRORES PUT
 
-200 OK: La venta fue actualizada exitosamente.
+**200 OK**: La venta fue actualizada exitosamente.
 {
   "Devuelve el objeto actualizado"
 }
-400 Bad Request: Algún campo en el cuerpo de la solicitud está vacío.
+**400 Bad Request**: Algún campo en el cuerpo de la solicitud está vacío.
 {
   "Todos los campos son obligatorios."
 }
-404 Not Found: No se encontró una venta con el id_venta especificado.
+**404 Not Found**: No se encontró una venta con el id_venta especificado.
 json
 
 {
   "Venta con id=$id no existe."
 }
-500 Internal Server Error: Error al actualizar la venta.
+**500 Internal Server Error**: Error al actualizar la venta.
 json
 {
   "Hubo un problema al actualizar la venta."
@@ -326,6 +325,6 @@ json
 ### METODO DELETE
 Endpoint: api/venta/:id
 Elimina la venta correspondiente al ID solicitado.
-Error 404: Si el id no existe.
+**Error 404**: Si el id no existe.
 
 
