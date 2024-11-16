@@ -59,15 +59,11 @@ La API de Gestión de Ventas ofrece los siguientes beneficios:
 {
       "id_venta": 34,
 
-
       "inmueble": "Departamento en pleno centro Tandil",
-
 
       "fecha_venta": "2024-09-04",
 
-
       "precio": 228990,
-
 
       "id_vendedor": 3,
 
@@ -77,19 +73,14 @@ La API de Gestión de Ventas ofrece los siguientes beneficios:
     {
       "id_venta": 36,
 
-
       "inmueble": " Excepcional cabaña en frente lago de Tandil, en plena sierra",
-
 
       "fecha_venta": "2024-10-08",
 
-
       "precio": 287000,
-
 
       "id_vendedor": 3,
 
-      
       "foto_url": "https://cdn.pixabay.com/photo/2016/09/23/10/20/cottage-1689224_1280.jpg"
     },
 ]
