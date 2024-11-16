@@ -16,6 +16,7 @@ URL- GITHUB: https://github.com/beatriznoemi412/apirestWeb2.git
      - [Ordenamiento](#ordenamiento)
      - [Filtros y Ordenamiento](#filtros-y-ordenamiento-de-ventas)
      - [Paginacion](#paginacion)
+     - [Respuesta](#arreglo-response)
    - [Obtener una venta por ID](#metodo-get)  
    - [Crear una nueva venta](#metodo-post)  
    - [Editar una venta existente](#metodo-put)  
@@ -57,18 +58,38 @@ La API de Gestión de Ventas ofrece los siguientes beneficios:
 [
 {
       "id_venta": 34,
+
+
       "inmueble": "Departamento en pleno centro Tandil",
+
+
       "fecha_venta": "2024-09-04",
+
+
       "precio": 228990,
+
+
       "id_vendedor": 3,
+
+
       "foto_url": "https://cdn.pixabay.com/photo/2014/09/04/05/54/construction-435302_1280.jpg"
     },
     {
       "id_venta": 36,
+
+
       "inmueble": " Excepcional cabaña en frente lago de Tandil, en plena sierra",
+
+
       "fecha_venta": "2024-10-08",
+
+
       "precio": 287000,
+
+
       "id_vendedor": 3,
+
+      
       "foto_url": "https://cdn.pixabay.com/photo/2016/09/23/10/20/cottage-1689224_1280.jpg"
     },
 ]
@@ -204,6 +225,28 @@ La API de Gestión de Ventas ofrece los siguientes beneficios:
  Este error ocurre cuando hay un problema inesperado en el servidor (por ejemplo, un fallo en la base de datos o un error en la lógica de procesamiento)."
 
 
+### ARREGLO RESPONSE: 
+
+
+El arreglo $response contiene toda la información que se necesita para manejar
+la paginación y los resultados de ventas en la API. Esta respuesta se enviará 
+como parte de la respuesta JSON, permitiendo a quien consume la API saber 
+cuántas ventas hay en total, en qué página está, cuántas ventas por página
+hay, y cuántas páginas totales existen para acceder a todas las ventas.
+
+
+- página: Indica que se está mostrando la primera página de resultados (pagina: 1).
+
+
+- limite: Define cuántos resultados se pueden mostrar por página. En este caso, se están mostrando un máximo de 3 ventas por página (limite: 3).
+
+
+- total_ventas: Es el número total de ventas en el sistema o base de datos. En este caso, hay un total de 7 ventas disponibles (total_ventas: 7).
+
+
+- total_paginas: Indica el número total de páginas que se pueden mostrar según el límite de ventas por página. Con un total de 7 ventas y un límite de 3 ventas por página, hay 3 páginas en total.
+
+
 ### METODO GET
 (app/controllers/sale.api.controller.php)
 - Se obtiene una venta por ID
@@ -225,10 +268,20 @@ Ejemplo de solicitud: /venta/1
 
 {
   "id_venta": 34,
+
+
   "inmueble": "Departamento en pleno centro Tandil",
+
+
   "fecha_venta": "2024-09-04",
+
+
   "precio": 228990,
+
+
   "id_vendedor": 3,
+
+
   "foto_url": "https://cdn.pixabay.com/photo/2014/09/04/05/54/construction-435302_1280.jpg"
 }
 ### ERRORES METODO GET
@@ -259,18 +312,6 @@ Indica que no se ha encontrado el recurso solicitado en el servidor, por ejemplo
 
 
 ventas: Es una lista vacía ([]), lo que indica que no hay datos disponibles para mostrar en esta consulta ya que no hay ventas con ese id.
-
-
-pagina: Indica que se está mostrando la primera página de resultados (pagina: 1).
-
-
-limite: Define cuántos resultados se pueden mostrar por página. En este caso, se están mostrando un máximo de 3 ventas por página (limite: 3).
-
-
-total_ventas: Es el número total de ventas en el sistema o base de datos. En este caso, hay un total de 7 ventas disponibles (total_ventas: 7).
-
-
-total_paginas: Indica el número total de páginas que se pueden mostrar según el límite de ventas por página. Con un total de 7 ventas y un límite de 3 ventas por página, hay 3 páginas en total.
 
 -------------------------------------------------------------------------------------------------------------
 
